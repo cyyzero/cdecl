@@ -9,13 +9,20 @@ public:
     enum Token_kind: uint8_t
     {
         Number, Identifier, Type,
-        Address , LCurly, RCurly, LSquare, RSquare, LBraket, RBraket, Star, Comma,
+        Address, LSquare, RSquare, LBraket, RBraket, Star, Comma,
         End
     };
     using Token = std::pair<Token_kind, std::string>;
 public:
     Tokenizer(const std::string& line)
         : m_line(line)
+    {
+        m_current = m_line.begin();
+        next();
+    }
+
+    Tokenizer(std::string&& line)
+        : m_line(std::move(line))
     {
         m_current = m_line.begin();
         next();
