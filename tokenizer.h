@@ -17,15 +17,25 @@ public:
     Tokenizer(const std::string& line)
         : m_line(line)
     {
-        m_current = m_line.begin();
-        next();
+        reset();
     }
 
     Tokenizer(std::string&& line)
         : m_line(std::move(line))
     {
-        m_current = m_line.begin();
-        next();
+        reset();
+    }
+
+    Tokenizer(const Tokenizer& tokenizer)
+        : m_line(tokenizer.m_line)
+    {
+        reset();
+    }
+
+    Tokenizer(Tokenizer&& tokenizer)
+        : m_line(std::move(tokenizer.m_line))
+    {
+        reset();
     }
 
     ~Tokenizer() = default;

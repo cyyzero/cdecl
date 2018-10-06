@@ -31,7 +31,7 @@ void Tokenizer::next()
         else if (isalpha(*m_current))
         {
             last_pos = m_current;
-            while (m_current != m_line.end() && isalpha(*m_current))
+            while (m_current != m_line.end() && (isalnum(*m_current) || *m_current == '_'))
             {
                 ++m_current;
             }
