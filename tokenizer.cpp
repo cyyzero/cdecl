@@ -1,36 +1,37 @@
 #include <string>
-#include <unordered_map>
+#include <unordered_set>
 #include "tokenizer.h"
 
-Token Tokenizer::get()
+Tokenizer::Token Tokenizer::get()
 {
     return m_token;
 }
 
 void Tokenizer::next()
 {
-    static std::unordered_map<std::string> types = {
+    static std::unordered_set<std::string> types = {
         "void", "int", "short", "float", "double", "char"
     };
 
-    auto end = m_line.end();
-
-    while (m_current != m_line.end())
+    if (m_current != m_line.end())
     {
         decltype(m_current) last_pos;
+        while (m_current != m_line.end() && isspace(*m_current))
+            ++m_current;
         if (isdigit(*m_current))
         {
             last_pos = m_current;
-            while (m_current < m_line.end() && isdigit(*m_current))
+            while (m_current != m_line.end() && isdigit(*m_current))
             {
                 ++m_current;
             }
-            m_token = {Number, sd::string(last_pos, m_current)};
+            m_token = {Number, std::string(last_pos, m_current)};
+            return;
         }
         else if (isalpha(*m_current))
         {
             last_pos = m_current;
-            while (m_current < m_line.end() && isalpha(*m_current))
+            while (m_current != m_line.end() && isalpha(*m_current))
             {
                 ++m_current;
             }
@@ -43,36 +44,41 @@ void Tokenizer::next()
             {
                 m_token = {Identifier, std::move(type)};
             }
+            return;
         }
         else
         {
-            switch (*m_current)
+            last_pos = m_current;
+            ++m_current;
+            switch (*last_pos)
             {
             case '*':
                 m_token = {Star, "*"};
-                break;
+                return;
             case '&':
                 m_token = {Address, "&"};
-                break;
+                return;
             case ',':
                 m_token = {Comma, ","};
-                break;
+                return;
             case '[':
                 m_token = {LSquare, "["};
-                break;
+                return;
             case ']':
                 m_token = {RSquare, "]"};
-                break;
+                return;
             case '(':
                 m_token = {LBraket, "("};
-                break;
+                return;
             case ')':
                 m_token = {RBraket, ")"};
+                return;
             default:
                 throw std::logic_error("Bad token");
             }
         }
     }
+    m_token = {End, "end"};
 }
 
 void Tokenizer::reset()
