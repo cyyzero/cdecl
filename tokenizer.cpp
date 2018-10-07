@@ -2,7 +2,7 @@
 #include <unordered_set>
 #include "tokenizer.h"
 
-Tokenizer::Token Tokenizer::get()
+const Tokenizer::Token& Tokenizer::get()
 {
     return m_token;
 }

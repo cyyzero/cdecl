@@ -40,7 +40,7 @@ public:
 
     ~Tokenizer() = default;
 
-    Token get();
+    const Token& get();
     void next();
     void reset();
 private:
