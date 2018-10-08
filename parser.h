@@ -23,7 +23,7 @@ public:
 
 protected:
     virtual void recursive_parse() = 0;
-    Symbol m_entry;
+    Symbol m_symbol;
     Tokenizer m_tokenizer;
 };
 
@@ -51,4 +51,4 @@ private:
     void recursive_parse() override;
 };
 
-#endif //  PARSER_H
+#endif // PARSER_H
