@@ -1,7 +1,11 @@
 #include <iostream>
 #include <string>
+#include <unordered_map>
 #include "tokenizer.h"
 #include "parser.h"
+
+extern std::unordered_map<std::string, std::string> g_symbols;
+
 int main()
 {
     std::string line;
@@ -11,9 +15,19 @@ int main()
         try
         {
             Tokenizer tokenizer(std::move(line));
-            Decl_parser parser(tokenizer);
-            auto entry = parser.parse();
-            std::cout << entry.name << " " << entry.type << std::endl;
+            if (tokenizer.get().first == Tokenizer::Type)
+            {
+                Decl_parser parser(tokenizer);
+                auto entry = parser.parse();
+                g_symbols[entry.name] = entry.type;
+                std::cout << entry.name << " " << entry.type << std::endl;
+            }
+            else
+            {
+                Use_parser parser(tokenizer);
+                auto entry = parser.parse();
+                std::cout << entry.name << " " << entry.type << std::endl;
+            }
         }
         catch (std::exception& e)
         {

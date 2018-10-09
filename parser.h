@@ -6,6 +6,23 @@
 
 struct Symbol
 {
+    Symbol() = default;
+    Symbol(const Symbol&) = default;
+    Symbol(Symbol&&) = default;
+
+    Symbol(const std::string& n, const std::string& t)
+        : name(n), type(t)
+    {
+    }
+
+    Symbol(std::string&& n, std::string&& t)
+        : name(std::move(n)), type(std::move(t))
+    {
+    }
+
+    Symbol& operator=(const Symbol&) = default;
+    Symbol& operator=(Symbol&&) = default;
+
     std::string name;
     std::string type;
 };
@@ -47,6 +64,7 @@ public:
         : Parser(tokenizer)
     {
     }
+
 private:
     void recursive_parse() override;
 };

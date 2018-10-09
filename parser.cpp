@@ -4,7 +4,7 @@
 #include "tokenizer.h"
 #include "parser.h"
 
-std::unordered_map<std::string, std::string> symbols;
+std::unordered_map<std::string, std::string> g_symbols;
 
 // class Parser
 Symbol Parser::parse()
@@ -39,11 +39,19 @@ void Decl_parser::recursive_parse()
     case Tokenizer::Star:
         m_tokenizer.next();
         recursive_parse();
+        if (m_tokenizer.get().first == Tokenizer::LSquare)
+        {
+            recursive_parse();
+        }
         m_symbol.type += "*";
         break;
     case Tokenizer::Type:
         m_tokenizer.next();
         recursive_parse();
+        if (m_tokenizer.get().first == Tokenizer::LSquare)
+        {
+            recursive_parse();
+        }
         m_symbol.type += token.second[0];
         break;
     default:
@@ -110,19 +118,19 @@ void Use_parser::recursive_parse()
     {
     case Tokenizer::Identifier:
     {
-        auto it = symbols.find(token.second);
-        if (it == symbols.end())
+        auto it = g_symbols.find(token.second);
+        if (it == g_symbols.end())
         {
             throw std::logic_error("Unknown identifier");
         }
-        m_symbol = Symbol(it.first, it.second);
+        m_symbol = Symbol(it->first, it->second);
         m_tokenizer.next();
         break;
     }
     case Tokenizer::LBraket:
         m_tokenizer.next();
         recursive_parse();
-        if (m_tokenizer.get().next != Tokenizer::RBraket)
+        if (m_tokenizer.get().first != Tokenizer::RBraket)
         {
             throw std::logic_error("syntax error");
         }
@@ -153,15 +161,8 @@ void Use_parser::recursive_parse()
     }
 
     token = m_tokenizer.get();
-    switch (token.first)
+    if (token.first ==  Tokenizer::LSquare)
     {
-    case Tokenizer::LSquare:
-    {
-        if (m_symbol.type[0] != 'A')
-        {
-            std::string err = m_symbol.name + " is not an array";
-            throw std::logic_error(err.c_str());
-        }
         m_tokenizer.next();
         auto number = m_tokenizer.get();
         if (number.first != Tokenizer::Number)
@@ -173,6 +174,33 @@ void Use_parser::recursive_parse()
         {
             throw std::logic_error("syntax error");
         }
+        m_tokenizer.next();
+
+        if (m_symbol.type[0] == 'A')       // type is array
+        {
+            auto it = m_symbol.type.begin() + 1;
+            while (isdigit(*it))
+            {
+                ++it;
+            }
+            auto index = stoul(number.second);
+            auto length = stoul(std::string(m_symbol.type.begin() + 1, it));
+            if (index >= length)
+            {
+                throw std::logic_error("index out of range");
+            }
+            m_symbol.type.erase(m_symbol.type.begin(), it+1);
+            m_symbol.name = m_symbol.name + "[" + number.second + "]";
+        }
+        else if (m_symbol.type[0] == '*')  // type is pointer
+        {
+            m_symbol.type.erase(0, 1);
+            m_symbol.name = m_symbol.name + "[" + number.second + "]";
+        }
+        else
+        {
+            throw std::logic_error("syntax");
+        }
     }
-    }
+    recursive_parse();
 }
