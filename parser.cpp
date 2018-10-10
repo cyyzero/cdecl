@@ -6,6 +6,65 @@
 
 std::unordered_map<std::string, std::string> g_symbols;
 
+void human_readable(const std::string& type)
+{
+    // std::string readable_type;
+    auto cur = type.begin();
+    while (cur != type.end())
+    {
+        // "void", "int", "short", "float", "double", "char"
+        switch (*cur)
+        {
+        case 'A':
+        {
+            ++cur;
+            auto last = cur;
+            // ++cur;
+            std::cout << "array ";
+            while (isdigit(*last))
+            {
+                ++cur;
+            }
+            std::cout << std::string(last, cur) << " of ";
+            ++cur;
+            break;
+        }
+
+        case '*':
+            ++cur;
+            std::cout << "pointer to ";
+            break;
+
+        case 'F':
+        case 'v':
+            ++cur;
+            std::cout << "void ";
+            break;
+
+        case 'i':
+            ++cur;
+           std::cout << "int ";
+           break;
+
+        case 's':
+            ++cur;
+            std::cout << "short ";
+            break;
+
+        case 'f':
+            ++cur;
+            std::cout << "float ";
+            break;
+
+        case 'd':
+            
+        case 'c':
+        default:
+            throw std::logic_error("fuck");
+        }
+    }
+}
+
 // class Parser
 Symbol Parser::parse()
 {
